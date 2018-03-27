@@ -14,17 +14,17 @@ public class Main {
 	public static void main(String[] args) {
 		
 		Path userHome = Paths.get(System.getProperty("user.home"));
-		Path path = Paths.get(userHome + "/nand2tetris/projects/08/FunctionCalls/FibonacciElement");
+		Path path = Paths.get(userHome + "/nand2tetris/projects/10/ArrayTest/");
 		
 		Tokenizer tokenizer = null;
 		
 		if (path.toFile().isDirectory() && Files.exists(path)) {
-			try (DirectoryStream<Path> stream = Files.newDirectoryStream(path, "*.{vm}")) {
-			
+			try (DirectoryStream<Path> stream = Files.newDirectoryStream(path, "*.{jack}")) {
+				
 				for (Path file: stream) {
 					tokenizer = new Tokenizer(file);
-					tokenizer.advance();
 					System.out.println(file.toString());
+					tokenizer.advance();
 		    	}
 			} catch (IOException | DirectoryIteratorException x) {
 		    	// IOException can never be thrown by the iteration.

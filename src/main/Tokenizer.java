@@ -8,6 +8,7 @@ public class Tokenizer {
 	
 	Path path;
 	Scanner filescanner;
+	String token;
 	String line;
 	String command;
 	
@@ -17,16 +18,21 @@ public class Tokenizer {
 	}
 	
 	public boolean hasMoreTokens() {
-		return filescanner.hasNextLine();
+		return filescanner.hasNext();
 	}
 	
 	public void advance() {
-		line = filescanner.nextLine();
-		if (line.startsWith("//") || line.isEmpty() && hasMoreTokens()) {
-			advance();
-		} else {
-			
+		
+		while (hasMoreTokens()) {
+			token = filescanner.next();
+			if (token.startsWith("/") || token.isEmpty()) {
+				line = filescanner.nextLine();
+				advance();
+			} else {
+			System.out.println(token);
+			}
 		}
+		System.out.println("No more tokens!");
 		
 	}
 	
