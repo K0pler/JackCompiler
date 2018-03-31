@@ -23,8 +23,7 @@ public class Main {
 				
 				for (Path file: stream) {
 					tokenizer = new Tokenizer(file);
-					System.out.println(file.toString());
-					tokenizer.advance();
+					
 		    	}
 			} catch (IOException | DirectoryIteratorException x) {
 		    	// IOException can never be thrown by the iteration.
