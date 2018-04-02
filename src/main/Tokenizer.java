@@ -18,7 +18,7 @@ public class Tokenizer {
 	protected List<String> linesToParse = new ArrayList<String>();
 	String command;
 	List<String> lines;
-	List<String> tokens;
+	protected List<String> tokens = new ArrayList<String>();
 	Boolean addString = true;
 	String lineToParse = "";
 	
@@ -40,19 +40,48 @@ public class Tokenizer {
 				 if (!l.startsWith("//") && l != null && !l.isEmpty() && addString == true){
 					 linesToParse.add(l);
 					 //System.out.println(jenny);
-					 lineToParse = lineToParse + " " + l;
+					 l.trim();
+					 lineToParse = lineToParse + l + " ";
 				 }
 			 }
-			 System.out.println(lineToParse);
+			 //System.out.println(lineToParse);
 			 for(String s : linesToParse) {
-				 System.out.println(s);
+				 //System.out.println(s);
 			 }
+			 String s = "";
+			 for (int i = 0 ; i < lineToParse.length() ; i++) {
+				 char c = lineToParse.charAt(i);
+				 if (c == ' ') {
+					 if (!s.isEmpty()) {
+						 tokens.add(s.trim());
+						 s = "";
+					 }
+				 }
+				 if (c == '(' || c == ')' || c == ';' || c == ',' || c == '.') {
+					 if (!s.isEmpty()) {
+						 tokens.add(s.trim());
+						 s = "";
+					 }
+					 tokens.add("" + c);
+						 s = "";
+				 } else {
+					 s = s + c; 
+				 }
+				 //System.out.println(c);
+			 }
+			 //System.out.println(s);
 			 
+			 for(String t : tokens) {
+				 System.out.println(t);
+			 }
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		//System.out.println(tokens.toString());
 	    }
+	
+	
 	
 	public boolean hasMoreTokens() {
 		return !tokens.isEmpty();
