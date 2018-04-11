@@ -1,7 +1,12 @@
 package main;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -12,7 +17,6 @@ import java.util.Scanner;
 public class Tokenizer {
 	
 	Path path;
-	Scanner sc;
 	String token;
 	String line = "";
 	protected List<String> linesToParse = new ArrayList<String>();
@@ -22,67 +26,40 @@ public class Tokenizer {
 	Boolean addString = true;
 	String lineToParse = "";
 	
-	public Tokenizer(Path path)throws FileNotFoundException {
+	public Tokenizer(Path path)throws FileNotFoundException, IOException {
 		this.path = path;
 		try {
-			lines = Files.readAllLines(path, StandardCharsets.UTF_8);
-			
-			 for(String s : lines) {
-				 String l = s.trim();
-				 if (l.contains("/**") && !l.contains("*/")){
-					 addString = false;
-					 continue;
-				 }
-				 if (l.contains("*/")) {
-					 addString = true;
-					 continue;
-				 }
-				 if (!l.startsWith("//") && l != null && !l.isEmpty() && addString == true){
-					 linesToParse.add(l);
-					 //System.out.println(jenny);
-					 l.trim();
-					 lineToParse = lineToParse + l + " ";
-				 }
-			 }
-			 //System.out.println(lineToParse);
-			 for(String s : linesToParse) {
-				 //System.out.println(s);
-			 }
-			 String s = "";
-			 for (int i = 0 ; i < lineToParse.length() ; i++) {
-				 char c = lineToParse.charAt(i);
-				 if (c == ' ') {
-					 if (!s.isEmpty()) {
-						 tokens.add(s.trim());
-						 s = "";
-					 }
-				 }
-				 if (c == '(' || c == ')' || c == ';' || c == ',' || c == '.') {
-					 if (!s.isEmpty()) {
-						 tokens.add(s.trim());
-						 s = "";
-					 }
-					 tokens.add("" + c);
-						 s = "";
-				 } else {
-					 s = s + c; 
-				 }
-				 //System.out.println(c);
-			 }
-			 //System.out.println(s);
-			 
-			 for(String t : tokens) {
-				 System.out.println(t);
-			 }
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			InputStream in = new FileInputStream(path.toFile());
+		    Reader reader = new InputStreamReader(in, StandardCharsets.UTF_8);
+		    Reader buffer = new BufferedReader(reader);
+		    int r;
+	        while ((r = buffer.read()) != -1) {
+	            char ch = (char) r;
+	            //Removes single- and multi-line comments
+	            String comment = "";
+	            if (ch == '/') {
+	            	char c = (char) buffer.read();
+	            	if (c == '/') {
+	            		while ((char) buffer.read() != '\n') {
+	            		}
+	            	} else if (c == '*') {
+	            		while(!comment.contains("*/")) {
+	            			comment = comment + (char) buffer.read();          			
+	            		}
+	            	}	
+	            	else {
+	            		System.out.print(ch);
+	            	}	
+	            }
+	            if (ch != '\n' && ch != '\t' && ch != '\b' && ch != '\f' && ch != '\r' && ch != '/') {
+	            	System.out.print(ch);
+	            }
+	        }
+	        buffer.close();
+		} catch (Exception e) {
+			// TODO: handle exception
 		}
-		//System.out.println(tokens.toString());
-	    }
-	
-	
-	
+	}
 	public boolean hasMoreTokens() {
 		return !tokens.isEmpty();
 	}
