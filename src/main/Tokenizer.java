@@ -33,11 +33,17 @@ public class Tokenizer {
 		    Reader reader = new InputStreamReader(in, StandardCharsets.UTF_8);
 		    Reader buffer = new BufferedReader(reader);
 		    int r;
+		    token = "";
 	        while ((r = buffer.read()) != -1) {
 	            char ch = (char) r;
 	            //Removes single- and multi-line comments
 	            String comment = "";
 	            if (ch == '/') {
+	            	if (!token.isEmpty()) {
+	            		tokens.add(token);
+	            		token = "";
+	            	}
+	            	buffer.mark(r);
 	            	char c = (char) buffer.read();
 	            	if (c == '/') {
 	            		while ((char) buffer.read() != '\n') {
@@ -46,14 +52,47 @@ public class Tokenizer {
 	            		while(!comment.contains("*/")) {
 	            			comment = comment + (char) buffer.read();          			
 	            		}
-	            	}	
-	            	else {
-	            		System.out.print(ch);
-	            	}	
+	            	} else {
+	            		buffer.reset();
+	            		tokens.add(""+ch);
+	            	}
 	            }
-	            if (ch != '\n' && ch != '\t' && ch != '\b' && ch != '\f' && ch != '\r' && ch != '/') {
-	            	System.out.print(ch);
+	            //Tokenizes doublequotes.
+	            else if (ch == '"') {
+	            	if (!token.isEmpty()) {
+	            		tokens.add(token);
+	            		token = "";
+	            	}
+	            	tokens.add("" + ch);
+	            	String quote = "";
+	            	ch = (char) buffer.read();
+	            	while (ch != '"'){
+	            		quote = quote + ch;
+	            		ch = (char) buffer.read();
+	            	}
+	            	if (!quote.isEmpty()){
+	            		tokens.add(quote);
+	            	}
+	            	tokens.add("" + ch);
 	            }
+	            else if (ch == '\n' || ch == '\t' || ch == '\b' || ch == '\f' || ch == '\r' || ch == ' ') {
+	            	if (!token.isEmpty()) {
+	            		tokens.add(token);
+	            		token = "";
+	            	}
+	            }
+	            else if (ch == ';' || ch == '.' || ch == ',' || ch == '(' || ch == ')' || ch == '{' || ch == '}' || ch == '[' || ch == ']') {
+	            	if (!token.isEmpty()) {
+	            		tokens.add(token);
+	            		token = "";
+	            	}
+	            	tokens.add("" + ch);
+	            } else {
+	            	token = token + ch;
+	            }
+	        }
+	        for (String t : tokens) {
+	        		System.out.print(t + " ");
 	        }
 	        buffer.close();
 		} catch (Exception e) {
