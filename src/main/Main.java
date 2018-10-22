@@ -20,10 +20,11 @@ public class Main {
 		
 		if (path.toFile().isDirectory() && Files.exists(path)) {
 			try (DirectoryStream<Path> stream = Files.newDirectoryStream(path, "*.{jack}")) {
-				
 				for (Path file: stream) {
 					tokenizer = new Tokenizer(file);
-					
+					while (tokenizer.token != "/end") {
+						tokenizer.advance();
+					}
 		    	}
 			} catch (IOException | DirectoryIteratorException x) {
 		    	// IOException can never be thrown by the iteration.
