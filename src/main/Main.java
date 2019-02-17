@@ -22,8 +22,10 @@ public class Main {
 			try (DirectoryStream<Path> stream = Files.newDirectoryStream(path, "*.{jack}")) {
 				for (Path file: stream) {
 					tokenizer = new Tokenizer(file);
-					while (tokenizer.token != "/end") {
-						tokenizer.advance();
+					String token = "";
+					while (token != "/end") {
+						token = tokenizer.advance();
+						System.out.println("token: " + token);
 					}
 		    	}
 			} catch (IOException | DirectoryIteratorException x) {

@@ -9,7 +9,6 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.ArrayList;
 
 public class Tokenizer {
 	
@@ -21,11 +20,9 @@ public class Tokenizer {
 	InputStream in;
 	Reader reader;
 	Reader buffer;
-	ArrayList<String> tokens = new ArrayList<String>();
 	
 	public Tokenizer(Path path)throws FileNotFoundException, IOException {
 		this.path = path;
-		token = "";
 	    in = new FileInputStream(path.toFile());
 		reader = new InputStreamReader(in, StandardCharsets.UTF_8);
 		buffer = new BufferedReader(reader);
@@ -33,15 +30,47 @@ public class Tokenizer {
 	
 	public boolean hasMoreTokens() throws IOException {
 		r = buffer.read();
-		if (!tokens.isEmpty()) {
+		
+		if (r != -1) {
+			ch = (char) r;
 			return true;
 		} else {
 			return false;
 		}	
 	}
 	
-	public void advance() throws IOException {
-		
+	public String advance() throws IOException {
+		token = "";
+		if (hasMoreTokens()) {
+			if (ch == '/') {
+				token = token + ch;
+				buffer.mark(r);
+				if (hasMoreTokens() && (ch == '/' || ch == '*')) {
+					token = token + ch;
+					while(hasMoreTokens() && ch != '\n' && !token.contains("*/")) {
+						token = token + ch;	
+					}			
+					return token;	
+				}
+				buffer.reset();
+				return token;
+				
+			}
+			if (Character.isWhitespace(ch)) {
+				advance();
+			} else {
+				token = token + ch;
+			}
+			
+			while (hasMoreTokens())  {
+				if (Character.isWhitespace(ch))
+					return token;
+				token = token + ch;
+			}
+			return token;
+			
+			}
+		return "/end";
 	}
 	
 	public String tokenType() {
