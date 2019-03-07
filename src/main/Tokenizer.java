@@ -16,7 +16,9 @@ public class Tokenizer {
 	int r;
 	char ch;
 	String token;
+	String nextToken = null;
 	String command;
+	String tokenType;
 	InputStream in;
 	Reader reader;
 	Reader buffer;
@@ -30,7 +32,6 @@ public class Tokenizer {
 	
 	public boolean hasMoreTokens() throws IOException {
 		r = buffer.read();
-		
 		if (r != -1) {
 			ch = (char) r;
 			return true;
@@ -40,41 +41,77 @@ public class Tokenizer {
 	}
 	
 	public String advance() throws IOException {
+		
 		token = "";
-		if (hasMoreTokens()) {
+		
+		if (nextToken != null) {
+			token = nextToken;
+			nextToken = null;
+			return token;
+		}
+		
+		while (hasMoreTokens()) {
 			if (ch == '/') {
 				token = token + ch;
 				buffer.mark(r);
 				if (hasMoreTokens() && (ch == '/' || ch == '*')) {
 					token = token + ch;
-					while(hasMoreTokens() && ch != '\n' && !token.contains("*/")) {
+					while(hasMoreTokens() && (ch != '\n' && !token.contains("*/"))) {
+						buffer.mark(r);
 						token = token + ch;	
-					}			
+					}
+					buffer.reset();
 					return token;	
 				}
 				buffer.reset();
-				return token;
+			}
+			
+			if (ch == '"') {
+				nextToken = "" + ch;
+				while(hasMoreTokens() && ch != '"') {
+					nextToken = nextToken + ch;
+				}
+				if (token.isEmpty()) {
+					
+					advance();
+				} else {
+					
+					return token;
+				}
+			}
+			
+			if (ch=='{' || ch=='}' || ch=='(' || ch==')' || ch=='[' || ch==']' || ch=='.'
+				|| ch==',' || ch==';' || ch=='+' || ch=='-' || ch=='*' || ch=='/' || ch=='&' || ch=='|' || ch=='<'
+				|| ch=='>' || ch=='='  || ch=='-'){
+				if(token.isEmpty()) {
+					token = "" + ch;
+					return token;
+				} else {
+					nextToken = "" + ch;
+					return token;
+				}
 				
 			}
-			if (Character.isWhitespace(ch)) {
-				advance();
+			
+			if (!Character.isWhitespace(ch)) {
+				token = token + ch;
 			} else {
-				token = token + ch;
-			}
-			
-			while (hasMoreTokens())  {
-				if (Character.isWhitespace(ch))
+				if (token.isEmpty()) {
+					advance();
+				} 
+				if(!token.isEmpty()) {
 					return token;
-				token = token + ch;
+				}
 			}
-			return token;
+				
 			
-			}
+		}
+		
 		return "/end";
 	}
 	
-	public String tokenType() {
-		return "tokentype";
+	public String tokenType() { 
+		return tokenType;
 	}
 	
 	public String keyWord() {
